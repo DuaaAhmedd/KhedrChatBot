@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خضر - شات بوت زراعة الأشجار</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8e6;
+            direction: rtl;
+            text-align: right;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #2e7d32;
+            text-align: center;
+        }
+        .chat-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        #chat-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+        #input-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #chat-input {
+            width: 50%; /* تقليل العرض إلى 50% */
+            height: 25px; /* تقليل الارتفاع إلى 25px */
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px; /* تقليل حجم الخط ليناسب الحجم */
+        }
+        #send-btn {
+            padding: 5px 15px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            height: 25px; /* تقليل ارتفاع الزر */
+            vertical-align: middle;
+        }
+        #send-btn:hover {
+            background-color: #45a049;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .user-message {
+            background-color: #dcedc8;
+            text-align: right;
+        }
+        .bot-message {
+            background-color: #e0f7fa;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <h1>مرحبًا بك مع خضر!</h1>
+    <div class="chat-wrapper">
+        <div id="chat-container"></div>
+        <div id="input-container">
+            <input type="text" id="chat-input" placeholder="اكتب سؤالك هنا...">
+            <button id="send-btn" onclick="sendMessage()">إرسال</button>
+        </div>
+    </script>
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const chatInput = document.getElementById('chat-input');
+
+        function addMessage(message, className) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${className}`;
+            msgDiv.textContent = message;
+            chatContainer.appendChild(msgDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (message) {
+                addMessage(message, 'user-message');
+                chatInput.value = '';
+
+                fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    addMessage(`خضر: ${data.response}`, 'bot-message');
+                })
+                .catch(error => {
+                    addMessage('خضر: حدث خطأ، حاول مرة أخرى!', 'bot-message');
+                });
+            }
+        }
+
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        addMessage("مرحبًا! أنا خضر، اسألني عن الزراعة، الأمراض، الأنواع المناسبة للشوارع، أو العناية والسماد!", 'bot-message');
+    </script>
+</body>
+</html>
